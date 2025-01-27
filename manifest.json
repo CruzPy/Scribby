@@ -1,0 +1,42 @@
+{
+    "manifest_version": 3,
+    "name": "Scribby - Urology Smart Note Assistant",
+    "version": "1.0",
+    "description": "AI-powered tool for urology professionals to create, manage, and enhance patient notes efficiently.",
+    "permissions": [
+        "scripting",
+        "activeTab",
+        "storage",
+        "contextMenus",
+        "clipboardWrite"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "host_permissions": [
+        "*://*/*"
+    ],
+    "action": {
+        "default_title": "Scribby - Urology Assistant",
+        "default_icon": {
+            "16": "icon16.png",
+            "48": "icon48.png",
+            "128": "icon128.png"
+        }
+    },
+    "icons": {
+        "16": "icon16.png",
+        "48": "icon48.png",
+        "128": "icon128.png"
+    },
+    "commands": {
+        "open-notes": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+N",
+                "mac": "Command+Shift+N"
+            },
+            "description": "Open Scribby Urology Note Creation"
+        }
+    },
+    "short_name": "Scribby Urology"
+}
