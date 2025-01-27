@@ -49,12 +49,13 @@
 
 ## Screenshots
 
-### Scribby Toolbar
-![Scribby Toolbar](scribby.png)
 
-### Text Highlight Example
+
+### Inputting Patient Data
 ![Text Highlight](scribby_fillingnotes.png)
 
+### AI Generated Patient Note
+![Scribby Toolbar](scribby.png)
 ---
 
 ## Contributing
