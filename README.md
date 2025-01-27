@@ -1,15 +1,16 @@
-# # Scribby
+# Scribby
 
-**Scribby** is a powerful Google Chrome extension designed to streamline your productivity and enhance your browsing experience. Whether you're a developer, writer, or everyday web surfer, Scribby offers intuitive tools to interact with content directly from your browser.
+**Scribby** is a specialized Google Chrome extension designed to save medical professionals, particularly urologists, valuable time by automating the generation of patient notes. Whether you're reviewing patient histories, summarizing consultations, or preparing detailed notes, Scribby integrates seamlessly into your workflow, ensuring accuracy and efficiency.
 
 ---
 
 ## Features
 
-- **Text Interaction**: Highlight text on any webpage to access a range of tools like summarization, rewriting, and more.
-- **API Integration**: Easily connect your preferred API to enable advanced capabilities.
-- **User-Friendly Interface**: Enjoy a sleek and intuitive design tailored for efficiency.
-- **Customizable**: Configure the extension to suit your workflow with simple settings.
+- **AI-Powered Note Generation**: Highlight key points from patient data or consultations to instantly generate structured notes.
+- **Custom Templates**: Create and utilize templates tailored to urology, such as post-operative summaries, diagnosis documentation, and follow-up recommendations.
+- **Streamlined Workflow**: Minimize manual input and maximize time spent on patient care with intuitive tools.
+- **Secure API Integration**: Safeguard patient data while leveraging cutting-edge AI tools through secure API connections.
+- **Customizable Options**: Adjust settings and templates to align with your practice's specific needs.
 
 ---
 
@@ -26,15 +27,15 @@
 
 3. **Set Your API Key**
    - Open the extension and navigate to the settings page.
-   - Enter your API key to activate advanced features.
+   - Enter your secure API key to activate advanced features.
 
 ---
 
 ## Usage
 
-1. Highlight any text on a webpage.
-2. Right-click and choose an option from the Scribby menu.
-3. Customize your actions in the settings to better suit your needs.
+1. Highlight relevant text from electronic medical records (EMRs), consultation notes, or diagnostic findings.
+2. Right-click and select a note type (e.g., "Follow-Up Summary," "Diagnostic Notes").
+3. Review and edit the AI-generated note directly in the extension or copy it to your EMR system.
 
 ---
 
@@ -49,18 +50,19 @@
 
 ## Screenshots
 
-
-
 ### Inputting Patient Data
-![Text Highlight](scribby_fillingnotes.png)
 
-### AI Generated Patient Note
-![Scribby Toolbar](scribby.png)
+![Inputting Patient Data](scribby_fillingnotes.png)
+
+### AI-Generated Patient Note
+
+![AI-Generated Patient Note](scribby.png)
+
 ---
 
 ## Contributing
 
-We welcome contributions from developers around the world! To contribute:
+We welcome contributions from developers and medical professionals! To contribute:
 
 1. Fork the repository.
 2. Create a new branch for your feature or bugfix.
@@ -81,5 +83,5 @@ For feedback, suggestions, or issues, please open an issue on GitHub or contact 
 
 ---
 
-**Happy Browsing with Scribby!**
+**Revolutionize your note-taking process with Scribby!**
 
