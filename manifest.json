@@ -4,6 +4,7 @@
     "version": "1.0",
     "description": "AI-powered tool for urology professionals to create, manage, and enhance patient notes efficiently.",
     "permissions": [
+        "tabs",
         "scripting",
         "activeTab",
         "storage",

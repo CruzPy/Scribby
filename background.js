@@ -208,8 +208,6 @@ async function createPatientNote(tabId) {
                     modal.style.transform = 'translate(-50%, -50%)';
                 });
 
-
-
                 // Dragging logic
                 let isDragging = false;
                 let startX = 0;
@@ -644,17 +642,18 @@ async function createPatientNote(tabId) {
                     document.querySelectorAll('#dynamic-questions div').forEach((div) => {
                         const questionLabel = div.querySelector('label').textContent;
                         const yesChecked = div.querySelector('input[type="radio"][value="Yes"]')?.checked;
-                        const noChecked = div.querySelector('input[type="radio"][value="No"]')?.checked;
                         const additionalInput = div.querySelector('input[type="text"]')?.value.trim();
 
-                        const answer = yesChecked ? 'Yes' : noChecked ? 'No' : 'Unanswered';
-                        description += `${questionLabel}: ${answer}`;
+                        if (yesChecked) {
+                            description += `${questionLabel}: Yes`;
 
-                        if (additionalInput) {
-                            description += ` (Additional Info: ${additionalInput})`;
+                            if (additionalInput) {
+                                description += `, ${additionalInput}`;
+                            }
+                            description += '\n';
                         }
-                        description += '\n';
                     });
+
 
                     // Track all textarea inputs (including additional-info fields)
                     document.querySelectorAll('#dynamic-questions textarea').forEach((textarea) => {
@@ -691,8 +690,6 @@ async function createPatientNote(tabId) {
                     const patientNote = `Patient Details:\nName: ${name}\nAge: ${age}\nReason for Visit: ${reason}\nDetails:\n${description}`;
                     chrome.runtime.sendMessage({ type: 'send-to-chatgpt', data: patientNote });
                     modal.remove();
-
-                    console.log("Patient Note: ", patientNote);
                 });
 
 
@@ -776,8 +773,6 @@ async function createPatientNote(tabId) {
                             const textArea = document.createElement('textarea');
                             textArea.style.width = '100%';
                             textArea.style.minHeight = '40px';
-                            textArea.placeholder = question;
-
                             questionDiv.appendChild(textArea);
                         }
 
@@ -817,6 +812,8 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
 
 
 async function sendToChatGPT(text, action) {
+    console.log("Action: ", action)
+    console.log("Text: ", text)
     try {
         const { API_KEY } = await chrome.storage.sync.get("API_KEY");
         if (!API_KEY) {
@@ -824,7 +821,10 @@ async function sendToChatGPT(text, action) {
         }
         if(action == 'Scribby'){
             content = `
-                Generate a SOAP note that is concise, professional, and well-organized, suitable for clinical documentation. Follow these guidelines:
+                Based on this patient data, generate a SOAP note that is concise, professional, and well-organized, suitable for clinical documentation:
+                ${text}
+                
+                Strictly, follow these guidelines:
 
                 Subjective (HPI):
                 Write a detailed, elaborative paragraph for the History of Present Illness (HPI) based on the chief complaint.
@@ -964,18 +964,18 @@ function displayResult(result, tabId) {
 
             const container = document.createElement('div');
             container.style.position = 'absolute'; // Enable manual positioning
-            container.style.top = '100px'; // Initial position
-            container.style.left = '100px'; // Initial position
+            container.style.top = '100px';
+            container.style.left = '100px';
             container.style.padding = '15px';
-            container.style.backgroundColor = '#fff'; // White for better readability
-            container.style.color = '#000'; // Black text
+            container.style.backgroundColor = '#fff';
+            container.style.color = '#000';
             container.style.border = '1px solid #ccc';
             container.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.2)';
             container.style.borderRadius = '10px';
             container.style.zIndex = '10000';
             container.style.maxWidth = '500px';
-            container.style.maxHeight = '80vh'; // Ensure fits the viewport
-            container.style.overflowY = 'auto'; // Add scrolling for large content
+            container.style.maxHeight = '80vh';
+            container.style.overflowY = 'auto';
             container.style.fontFamily = 'Arial, sans-serif';
 
             // Dragging logic
@@ -989,14 +989,13 @@ function displayResult(result, tabId) {
                 isDragging = true;
                 startX = e.clientX;
                 startY = e.clientY;
-                const rect = modal.getBoundingClientRect(); // Get the modal's position
+                const rect = container.getBoundingClientRect();
                 initialX = rect.left;
                 initialY = rect.top;
 
                 document.addEventListener('mousemove', onMouseMove);
                 document.addEventListener('mouseup', onMouseUp);
 
-                // Disable text selection during drag
                 document.body.style.userSelect = 'none';
                 document.body.style.cursor = 'grabbing';
             };
@@ -1005,28 +1004,19 @@ function displayResult(result, tabId) {
                 if (isDragging) {
                     const deltaX = e.clientX - startX;
                     const deltaY = e.clientY - startY;
-
-                    // Update position dynamically
-                    modal.style.left = `${initialX + deltaX}px`;
-                    modal.style.top = `${initialY + deltaY}px`;
-
-                    // Clear the transform property to allow manual positioning
-                    modal.style.transform = '';
+                    container.style.left = `${initialX + deltaX}px`;
+                    container.style.top = `${initialY + deltaY}px`;
                 }
             };
 
             const onMouseUp = () => {
-                if (isDragging) {
-                    isDragging = false;
-
-                    document.removeEventListener('mousemove', onMouseMove);
-                    document.removeEventListener('mouseup', onMouseUp);
-
-                    // Re-enable text selection
-                    document.body.style.userSelect = '';
-                    document.body.style.cursor = '';
-                }
+                isDragging = false;
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+                document.body.style.userSelect = '';
+                document.body.style.cursor = '';
             };
+
             // Header Bar
             const header = document.createElement('div');
             header.style.backgroundColor = '#4CAF50';
@@ -1038,15 +1028,14 @@ function displayResult(result, tabId) {
             header.style.borderTopRightRadius = '10px';
             header.textContent = 'Scribby';
 
-            // Attach the onMouseDown event to the modal's drag handle (e.g., the header)
             header.addEventListener('mousedown', onMouseDown);
             header.addEventListener('mouseup', () => {
-                header.style.cursor = 'grab'; // Reset cursor after dragging
+                header.style.cursor = 'grab';
             });
 
             container.appendChild(header);
 
-            // Content Area
+            // Editable Content Area
             const content = document.createElement('div');
             content.style.padding = '20px';
             content.style.fontSize = '14px';
@@ -1054,55 +1043,37 @@ function displayResult(result, tabId) {
             content.style.textAlign = 'justify';
             content.style.color = '#333';
             content.style.backgroundColor = '#f9f9f9';
+            content.style.border = '1px solid #ccc';
+            content.style.borderRadius = '5px';
+            content.style.minHeight = '100px';
+            content.style.overflowY = 'auto';
+            content.style.whiteSpace = 'pre-wrap';
+            content.contentEditable = 'true'; // Enable text modification
 
-            if (output === "API key is not set. Please set it in the extension settings.") {
-                const info = document.createElement('p');
-                info.textContent = output;
-                content.appendChild(info);
-
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.placeholder = 'Enter your ChatGPT API Key';
-                input.style.width = '100%';
-                input.style.margin = '10px 0';
-                input.style.padding = '10px';
-                input.style.border = '1px solid #ccc';
-                input.style.borderRadius = '5px';
-                content.appendChild(input);
-
-                const saveButton = document.createElement('button');
-                saveButton.textContent = 'Save API Key';
-                saveButton.style.padding = '10px 15px';
-                saveButton.style.border = 'none';
-                saveButton.style.borderRadius = '5px';
-                saveButton.style.backgroundColor = '#4CAF50';
-                saveButton.style.color = '#fff';
-                saveButton.style.cursor = 'pointer';
-                saveButton.disabled = true;
-
-                input.addEventListener('input', () => {
-                    saveButton.disabled = !input.value.trim();
-                });
-
-                saveButton.addEventListener('click', () => {
-                    const apiKey = input.value.trim();
-                    if (apiKey) {
-                        chrome.storage.sync.set({ API_KEY: apiKey }, () => {
-                            alert('API Key saved successfully!');
-                            container.remove();
-                        });
-                    }
-                });
-
-                content.appendChild(saveButton);
-            } else {
-                content.innerHTML = output
+            // Load previously saved content from Chrome storage
+            chrome.storage.local.get(['scribbyContent'], (data) => {
+                content.innerHTML = data.scribbyContent || output
                     .split('\n')
                     .map(line => `<p>${line.trim()}</p>`)
                     .join('');
-            }
+            });
+
+            // Save content to Chrome storage on input
+            content.addEventListener('input', () => {
+                const updatedContent = content.innerHTML;
+                chrome.storage.local.set({ scribbyContent: updatedContent });
+            });
 
             container.appendChild(content);
+
+            // Buttons Container
+            const buttonsContainer = document.createElement('div');
+            buttonsContainer.style.display = 'flex';
+            buttonsContainer.style.justifyContent = 'center'; // Center buttons horizontally
+            buttonsContainer.style.gap = '10px'; // Add spacing between buttons
+            buttonsContainer.style.marginTop = '15px';
+            buttonsContainer.style.paddingTop = '10px';
+            buttonsContainer.style.borderTop = '1px solid #ddd';
 
             // Copy Text Button
             const copyButton = document.createElement('button');
@@ -1154,7 +1125,6 @@ function displayResult(result, tabId) {
                 }).catch(err => console.error('Failed to copy text:', err));
             });
 
-
             container.appendChild(copyButton);
 
             // Close Button
@@ -1171,10 +1141,21 @@ function displayResult(result, tabId) {
                 container.remove();
             });
 
-            container.appendChild(closeButton);
+            // Append buttons in proper order
+            buttonsContainer.appendChild(copyButton);
+            buttonsContainer.appendChild(openScribbyButton);
+            buttonsContainer.appendChild(closeButton);
 
+            container.appendChild(buttonsContainer);
             document.body.appendChild(container);
         },
         args: [result],
     });
 }
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === 'open_scribby') {
+        chrome.contextMenus.update('scribby', { visible: true });
+        sendResponse({ success: true });
+    }
+});
