@@ -954,16 +954,21 @@ function displayResult(result, tabId) {
     chrome.scripting.executeScript({
         target: { tabId },
         func: (output) => {
+            if (!output) return; // Prevent errors if output is empty
+
+            // Remove existing result if already displayed
+            document.querySelectorAll('.scribby-result-container').forEach(el => el.remove());
+
             // Play Sound
             const playSound = () => {
                 const audio = new Audio('ding.mp3');
                 audio.play().catch(err => console.error('Error playing sound:', err));
             };
-
             playSound(); // Play sound when result is displayed
 
             const container = document.createElement('div');
-            container.style.position = 'absolute'; // Enable manual positioning
+            container.classList.add('scribby-result-container');
+            container.style.position = 'fixed';
             container.style.top = '100px';
             container.style.left = '100px';
             container.style.padding = '15px';
@@ -980,10 +985,7 @@ function displayResult(result, tabId) {
 
             // Dragging logic
             let isDragging = false;
-            let startX = 0;
-            let startY = 0;
-            let initialX = 0;
-            let initialY = 0;
+            let startX = 0, startY = 0, initialX = 0, initialY = 0;
 
             const onMouseDown = (e) => {
                 isDragging = true;
@@ -1050,9 +1052,12 @@ function displayResult(result, tabId) {
             content.style.whiteSpace = 'pre-wrap';
             content.contentEditable = 'true'; // Enable text modification
 
-            // Load previously saved content from Chrome storage
+            // Format keywords with bold tags
+            const formattedOutput = output.replace(/(Subjective|Assessment|Objective|Plan)/g, '<strong>$1</strong>');
+
+            // Load previously saved content or display formatted output
             chrome.storage.local.get(['scribbyContent'], (data) => {
-                content.innerHTML = data.scribbyContent || output
+                content.innerHTML = data.scribbyContent || formattedOutput
                     .split('\n')
                     .map(line => `<p>${line.trim()}</p>`)
                     .join('');
@@ -1069,8 +1074,8 @@ function displayResult(result, tabId) {
             // Buttons Container
             const buttonsContainer = document.createElement('div');
             buttonsContainer.style.display = 'flex';
-            buttonsContainer.style.justifyContent = 'center'; // Center buttons horizontally
-            buttonsContainer.style.gap = '10px'; // Add spacing between buttons
+            buttonsContainer.style.justifyContent = 'center';
+            buttonsContainer.style.gap = '10px';
             buttonsContainer.style.marginTop = '15px';
             buttonsContainer.style.paddingTop = '10px';
             buttonsContainer.style.borderTop = '1px solid #ddd';
@@ -1141,9 +1146,8 @@ function displayResult(result, tabId) {
                 container.remove();
             });
 
-            // Append buttons in proper order
+            // Append buttons in order
             buttonsContainer.appendChild(copyButton);
-            buttonsContainer.appendChild(openScribbyButton);
             buttonsContainer.appendChild(closeButton);
 
             container.appendChild(buttonsContainer);
@@ -1152,10 +1156,3 @@ function displayResult(result, tabId) {
         args: [result],
     });
 }
-
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === 'open_scribby') {
-        chrome.contextMenus.update('scribby', { visible: true });
-        sendResponse({ success: true });
-    }
-});
